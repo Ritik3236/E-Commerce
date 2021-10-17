@@ -5,6 +5,8 @@ const ErrorHandler = require('../utils/errorHandler');
 const sendEmail = require('../utils/sendEmail')
 const catchAsyncError = require('../middleware/catchAsyncError');
 
+
+// Register User
 exports.registerUser = catchAsyncError(async (req, res, next) => {
 
     const { name, email, password } = req.body;
@@ -20,7 +22,6 @@ exports.registerUser = catchAsyncError(async (req, res, next) => {
 });
 
 // Login User
-
 exports.loginUser = catchAsyncError(async (req, res, next) => {
 
     const { email, password } = req.body;
@@ -56,7 +57,7 @@ exports.logout = catchAsyncError(async (req, res, next) => {
     res.status(200).json({ success: true, message: "logged Out Successfully" });
 })
 
-//forgot user
+//forgot user password step  - I
 exports.forgotPassword = catchAsyncError(async (req, res, next) => {
 
     const user = await User.findOne({ email: req.body.email });
@@ -91,7 +92,7 @@ exports.forgotPassword = catchAsyncError(async (req, res, next) => {
     }
 });
 
-// reset Password
+// reset Password step - II
 exports.resetPassword = catchAsyncError(async (req, res, next) => {
 
     const resetPasswordToken = crypto.createHash('sha256').update(req.params.token).digest('hex');
@@ -116,4 +117,81 @@ exports.resetPassword = catchAsyncError(async (req, res, next) => {
     await user.save();
 
     sendToken(user, 200, res)
+});
+
+// getUser detail
+
+exports.getUserDetails = catchAsyncError(async (req, res, next) => {
+
+    const user = await User.findById(req.user.id)
+
+    res.status(200).json({ success: true, user })
+
+});
+
+// Update User Password Using old Password
+
+exports.updatePassword = catchAsyncError(async (req, res, next) => {
+
+    const user = await User.findById(req.user.id).select("+password");
+
+    const isPasswordMatched = await user.comparePassword(req.body.oldPassword);
+
+    if (!isPasswordMatched) {
+        return next(new ErrorHandler("Old Password doesn't Match."), 400)
+    }
+
+    if (req.body.newPassword !== req.body.confirmPassword) {
+        return next(new ErrorHandler("Password doesn't Match", 400))
+    }
+
+    user.password = req.body.newPassword;
+    await user.save();
+
+    sendToken(user, 201, res)
+
+});
+
+
+// Update User Password Using old Password
+exports.updateProfile = catchAsyncError(async (req, res, next) => {
+
+    const newUserData = {
+        name: req.body.name,
+        email: req.body.email,
+    }
+
+    // We will add cloudanery Later
+
+    const user = await User.findByIdAndUpdate(req.user.id, newUserData, {
+        new: true,
+        runValidators: true,
+        useFindAndModify: false
+    });
+
+    res.status(200).json({ success: true });
+
 })
+
+// get all User detail  {Admin}
+
+exports.getAllUserDetails = catchAsyncError(async (req, res, next) => {
+
+    const users = await User.find()
+
+    res.status(200).json({ success: true, users })
+
+});
+// get Single User detail  {Admin}
+
+exports.getSingleUserDetails = catchAsyncError(async (req, res, next) => {
+
+    const user = await User.findById(req.params.id)
+
+    if (!user) {
+        return next(new ErrorHandler(`User Doesn't exist with Id : ${req.params.id}`))
+    }
+
+    res.status(200).json({ success: true, user })
+
+});
