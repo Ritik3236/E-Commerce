@@ -27,19 +27,19 @@ exports.loginUser = catchAsyncError(async (req, res, next) => {
     const { email, password } = req.body;
 
     if (!email || !password) {
-        return next(new ErrorHandler("Please Enter Email & Password"), 400);
+        return next(new ErrorHandler("Please Enter Email & Password", 400));
     }
 
     const user = await User.findOne({ email }).select("+password");
 
     if (!user) {
-        return next(new ErrorHandler("Invalid Email or Password"), 401);
+        return next(new ErrorHandler("Invalid Email or Password", 401));
     }
 
     const isPasswordMatched = await user.comparePassword(password);
 
     if (!isPasswordMatched) {
-        return next(new ErrorHandler("Invalid Email or Password"), 401)
+        return next(new ErrorHandler("Invalid Email or Password", 401))
     }
 
     sendToken(user, 201, res)
@@ -63,7 +63,7 @@ exports.forgotPassword = catchAsyncError(async (req, res, next) => {
     const user = await User.findOne({ email: req.body.email });
 
     if (!user) {
-        return next(new ErrorHandler("No User Found"), 404);
+        return next(new ErrorHandler("No User Found", 404));
     }
 
     //getResetPasswordToken
@@ -88,7 +88,7 @@ exports.forgotPassword = catchAsyncError(async (req, res, next) => {
         user.resetPasswordExpire = undefined;
         await user.save({ validateBeforeSave: false });
 
-        return next(new ErrorHandler(error.message), 500);
+        return next(new ErrorHandler(error.message, 500));
     }
 });
 
@@ -103,11 +103,11 @@ exports.resetPassword = catchAsyncError(async (req, res, next) => {
     });
 
     if (!user) {
-        return next(new ErrorHandler("Reset Password Token is invalid or has been expired."), 400);
+        return next(new ErrorHandler("Reset Password Token is invalid or has been expired.", 400));
     }
 
     if (req.body.password !== req.body.confirmPassword) {
-        return next(new ErrorHandler("Password doesn't Match."), 400);
+        return next(new ErrorHandler("Password doesn't Match.", 400));
     }
 
     user.password = req.body.password;
@@ -136,7 +136,7 @@ exports.updatePassword = catchAsyncError(async (req, res, next) => {
     const isPasswordMatched = await user.comparePassword(req.body.oldPassword);
 
     if (!isPasswordMatched) {
-        return next(new ErrorHandler("Old Password doesn't Match."), 400)
+        return next(new ErrorHandler("Old Password doesn't Match.", 400))
     }
 
     if (req.body.newPassword !== req.body.confirmPassword) {
@@ -187,7 +187,7 @@ exports.getSingleUserDetails = catchAsyncError(async (req, res, next) => {
     const user = await User.findById(req.params.id)
 
     if (!user) {
-        return next(new ErrorHandler(`User Doesn't exist with Id : ${req.params.id}`))
+        return next(new ErrorHandler(`User Doesn't exist with Id : ${req.params.id}`, 404))
     }
 
     res.status(200).json({ success: true, user })
@@ -218,13 +218,13 @@ exports.updateUserRole = catchAsyncError(async (req, res, next) => {
 exports.deleteUser = catchAsyncError(async (req, res, next) => {
 
     const user = await User.findById(req.params.id);
-    
+
     if (!user) {
-        return next(new ErrorHandler(`User Doesn't exist with Id : ${req.params.id}`))
+        return next(new ErrorHandler(`User Doesn't exist with Id : ${req.params.id}`, 404))
     }
 
     if (req.params.id === req.user.id) {
-        return next(new ErrorHandler("You can't delete your self"))
+        return next(new ErrorHandler("You can't delete your self", 400))
     }
 
     await user.remove()

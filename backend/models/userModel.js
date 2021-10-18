@@ -44,7 +44,6 @@ const userSchema = new mongoose.Schema({
 })
 
 // password hashing
-
 userSchema.pre("save", async function (next) {
 
     if (!this.isModified("password")) {
@@ -62,14 +61,12 @@ userSchema.methods.getJWT_token = function () {
 };
 
 // comparing Password
-
 userSchema.methods.comparePassword = async function (enteredPassword) {
     return await bcrypt.compare(enteredPassword, this.password)
 
 };
 
 // Generating Password reset token
-
 userSchema.methods.getResetPasswordToken = async function () {
 
     // Generating Token
