@@ -99,7 +99,6 @@ async function updateStock(id, quantity) {
     await product.save({ validateBeforeSave: false })
 };
 
-
 // delete order by {admin}
 exports.deleteOrder = catchAsyncError(async (req, res, next) => {
 
