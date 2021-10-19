@@ -1,0 +1,70 @@
+.banner {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    height: 100vmin;
+    background: linear-gradient(to right, #635dc0, #3027ae);
+    color: white;
+    font-family: 'Roboto';
+
+    p {
+        margin: 5vmax;
+        font-size: 2.5vmax;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 5px;
+    }
+
+    a {
+        button {
+            margin-bottom: 5vmax;
+            border: 1px solid white;
+            background-color: white;
+            padding: 1vmax;
+            cursor: pointer;
+            border-radius: 3px;
+            transition: all 0.5s;
+            width: 9vmax;
+            font: 500 1vmax "Roboto";
+
+            &:hover {
+                color: white;
+                background: transparent;
+            }
+        }
+    }
+
+    &::after {
+
+        top: 0;
+        left: 0;
+        content: '';
+        width: 100vw;
+        height: 100vmin;
+        max-width: 100%;
+        position: absolute;
+        background-color: white;
+        clip-path: polygon(0 100%, 100% 65%, 100% 100%, 0 100%);
+
+    }
+}
+
+.homeHeading {
+    text-align: center;
+    text-transform: uppercase;
+    font: 500 1.4vmax "Roboto";
+    border-bottom: 2px solid rgba(0, 0, 0 ,.7);
+    width: 20vmax;
+    margin: 5vmax auto;
+    padding: 1vmax;
+    color: rgba(0, 0, 0 ,.7);
+}
+.container {
+    display: flex;
+    margin: 2vmax auto;
+    width: 80vw;
+    flex-wrap: wrap;
+    justify-content: center;
+    max-width: 100%;
+  }
